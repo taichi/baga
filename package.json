@@ -6,17 +6,14 @@
   "author": "taichi",
   "main": "dist/index.js",
   "scripts": {
-    "build": "run-s clean lint compile test",
+    "build": "run-s clean lint bundle",
     "bundle": "webpack",
     "clean": "rm -r -f dist",
     "clean:all": "rm -r -f dist .cache",
-    "compile": "tsc --project .",
     "lint": "tslint --project .",
     "prepush": "cp src/appsscript.json ./dist/",
     "push": "clasp push",
-    "start": "ts-node src/index.ts",
-    "test": "ava",
-    "watch": "ava -w"
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "moment": "^2.24.0"
@@ -33,6 +30,7 @@
     "cross-env": "^5.2.0",
     "gas-webpack-plugin": "^1.0.2",
     "npm-check-updates": "^3.1.21",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.18.2",
     "sort-package-json": "^1.22.1",
     "ts-loader": "^6.0.4",
