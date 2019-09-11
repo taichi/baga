@@ -73,10 +73,5 @@ function search(label: GoogleAppsScript.Gmail.GmailLabel, handler: (studio: stri
   Logger.log("END   search");
 }
 
-function getStudio(msg: GoogleAppsScript.Gmail.GmailMessage) {
-  const fromres = /\((.*)LS\)/.exec(msg.getFrom());
-  return fromres ? fromres[1] : "不明";
-}
-
 // tslint:disable-next-line: no-unsafe-any
 global.main = main;
