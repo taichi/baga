@@ -46,7 +46,7 @@ function makeLabel(name: string) {
 
 function search(label: GoogleAppsScript.Gmail.GmailLabel, handler: (studio: string, begin: Date, end: Date) => void) {
   Logger.log("START search");
-  const threads = GmailApp.search(`subject:(予約いただいているレッスンのご連絡) -label:${label.getName()}`);
+  const threads = GmailApp.search(`subject:(ご予約いただいているレッスン・セミナーのご連絡) -label:${label.getName()}`);
   if (!threads) {
     Logger.log("No reservation");
     Logger.log("END   search");
@@ -54,14 +54,17 @@ function search(label: GoogleAppsScript.Gmail.GmailLabel, handler: (studio: stri
   }
   for (const thd of threads) {
     for (const msg of thd.getMessages()) {
-      const studio = getStudio(msg);
       const body = msg.getPlainBody();
-      const time = /(\d{1,2}:\d{1,2}) - (\d{1,2}:\d{1,2})/g;
-      let result = time.exec(body);
-      const toDate = (t: string) => moment(`${getDay(body)} ${t}`, "MM/DD hh:mm").toDate();
-      while (result) {
-        handler(studio, toDate(result[1]), toDate(result[2]));
-        result = time.exec(body);
+      const reg = /時間：(\d{4}\/\d{1,2}\/\d{1,2}) (\d{1,2}:\d{1,2})-(\d{1,2}:\d{1,2})/;
+      const result = reg.exec(body);
+
+      const locreg = /場所：(.*)LS/;
+      const locres = locreg.exec(body);
+      if (result && locres) {
+        const from = moment(`${result[1]} ${result[2]}`, "YYYY/MM/DD hh:mm").toDate();
+        const to = moment(`${result[1]} ${result[3]}`, "YYYY/MM/DD hh:mm").toDate();
+        const location = locres[1];
+        handler(location, from, to);
       }
       GmailApp.starMessage(msg);
     }
@@ -73,15 +76,6 @@ function search(label: GoogleAppsScript.Gmail.GmailLabel, handler: (studio: stri
 function getStudio(msg: GoogleAppsScript.Gmail.GmailMessage) {
   const fromres = /\((.*)LS\)/.exec(msg.getFrom());
   return fromres ? fromres[1] : "不明";
-}
-
-function getDay(body: string) {
-  const d = /(\d{1,2})月(\d{1,2})日のレッスンのリマインダーです。/.exec(body);
-  if (!d) {
-    Logger.log(`${body} is not Gaba message`);
-    throw new Error("cannot parse lesson date.");
-  }
-  return `${d[1]}/${d[2]}`;
 }
 
 // tslint:disable-next-line: no-unsafe-any
