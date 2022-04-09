@@ -16,7 +16,7 @@
     "start": "ts-node src/index.ts"
   },
   "dependencies": {
-    "moment": "^2.24.0"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
     "@google/clasp": "^2.3.0",
